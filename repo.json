@@ -1,7 +1,6 @@
 [{
   "Name": "snippets",
-  "Description": "plugin to insert language specific code snippets \
-see https://github.com/boombuler/microsnippets for details.",
+  "Description": "plugin to insert language specific code snippets.",
   "Tags": ["snippet"],
   "Versions": [
     {
