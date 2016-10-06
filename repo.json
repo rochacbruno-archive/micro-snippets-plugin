@@ -5,10 +5,10 @@ see https://github.com/boombuler/microsnippets for details.",
   "Tags": ["snippet"],
   "Versions": [
     {
-      "Version": "0.1.1",
-      "Url": "https://github.com/boombuler/microsnippets/releases/download/v0.1.1/snippets_0.1.1.zip",
+      "Version": "0.1.2",
+      "Url": "https://github.com/boombuler/microsnippets/releases/download/v0.1.2/snippets_0.1.2.zip",
       "Require": {
-        "micro": ">=1.0.3"
+        "micro": ">1.0.3"
       }
     }
   ]
