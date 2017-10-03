@@ -311,8 +311,10 @@ function onBeforeTextEvent(ev)
 			return true
 		end
 
-		local locStart = currentSnippet:findLocation(ev.Start:Move(1, CurView().Buf))
-		local locEnd = currentSnippet:findLocation(ev.End)
+		if ev.Start ~= nil and currentSnippet ~= nil then
+			local locStart = currentSnippet:findLocation(ev.Start:Move(1, CurView().Buf))
+			local locEnd = currentSnippet:findLocation(ev.End)
+		end
 
 		if locStart ~= nil and ((locStart == locEnd) or (ev.End.Y==0 and ev.End.X==0))  then
 			if locStart:handleInput(ev) then
