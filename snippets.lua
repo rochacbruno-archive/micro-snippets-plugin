@@ -85,13 +85,13 @@ end
 function Location.handleInput(self, ev)
 	if ev.EventType == 1 then
 		-- TextInput
-		if ev.Text == "\n" then
+		if ev.Deltas[1].Text == "\n" then
 			Accept()
 			return false
 		else
 			local offset = 1
 			local sp = self:startPos()
-			while sp:LessEqual(-ev.Start) do
+			while sp:LessEqual(-ev.Deltas[1].Start) do
 				sp = sp:Move(1, self.snippet.view.Buf)
 				offset = offset + 1
 			end
@@ -102,7 +102,7 @@ function Location.handleInput(self, ev)
 				v = ""
 			end
 
-			self.ph.value = v:sub(0, offset-1) .. ev.Text .. v:sub(offset)
+			self.ph.value = v:sub(0, offset-1) .. ev.Deltas[1].Text .. v:sub(offset)
 			self.snippet:insert()
 			return true
 		end
@@ -110,12 +110,12 @@ function Location.handleInput(self, ev)
 		-- TextRemove
 		local offset = 1
 		local sp = self:startPos()
-		while sp:LessEqual(-ev.Start) do
+		while sp:LessEqual(-ev.Deltas[1].Start) do
 			sp = sp:Move(1, self.snippet.view.Buf)
 			offset = offset + 1
 		end
 
-		if ev.Start.Y ~= ev.End.Y then
+		if ev.Deltas[1].Start.Y ~= ev.Deltas[1].End.Y then
 			return false
 		end
 
@@ -126,7 +126,7 @@ function Location.handleInput(self, ev)
 			v = ""
 		end
 
-		local len = ev.End.X - ev.Start.X
+		local len = ev.Deltas[1].End.X - ev.Deltas[1].Start.X
 
 		self.ph.value = v:sub(0, offset-1) .. v:sub(offset+len)
 		self.snippet:insert()
@@ -311,12 +311,14 @@ function onBeforeTextEvent(ev)
 			return true
 		end
 
-		if ev.Start ~= nil and currentSnippet ~= nil then
-			local locStart = currentSnippet:findLocation(ev.Start:Move(1, CurView().Buf))
-			local locEnd = currentSnippet:findLocation(ev.End)
-		end
+		local locStart = nil
+		local locEnd = nil
 
-		if locStart ~= nil and ((locStart == locEnd) or (ev.End.Y==0 and ev.End.X==0))  then
+        if ev.Deltas[1].Start ~= nil and currentSnippet ~= nil then
+			locStart = currentSnippet:findLocation(ev.Deltas[1].Start:Move(1, CurView().Buf))
+			locEnd = currentSnippet:findLocation(ev.Deltas[1].End)
+		end
+		if locStart ~= nil and ((locStart == locEnd) or (ev.Deltas[1].End.Y==0 and ev.Deltas[1].End.X==0))  then
 			if locStart:handleInput(ev) then
 				CurView().Cursor:Goto(-ev.C)
 				return false
