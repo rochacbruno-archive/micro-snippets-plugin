@@ -1,3 +1,5 @@
+This project was originally created by [boombuler](https://github.com/boombuler)
+
 ## Introduction
 
 This is a simple snippet plugin for the [micro](https://github.com/zyedidia/micro) editor.
