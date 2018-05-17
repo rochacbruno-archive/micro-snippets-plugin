@@ -9,19 +9,20 @@ place a file containing the snippets at `~/.config/micro/plugins/snippets/[filet
 
 The plugin provides the following commands:
 
-|----------------------------------------------------------------------------------|
-| Command       |     Description                               | Shortcut Key     |
-|----------------------------------------------------------------------------------|
-| snippetinsert | with an optional parameter to specify which snippet  |           |
-|               | should be inserted.                                  | (`Alt+S`) |
-|               | If the parameter is absent, the word right           |           |
-|               | before the cursor will be used for this.             |           |
-|----------------------------------------------------------------------------------|
-| snippetnext   | proceeds to the next placeholder                     | (`Alt+W`) |
-|----------------------------------------------------------------------------------|
-| snippetcancel | removes all the current snippet                      | (`Alt+D`) |
-| snippetaccept | finishes the snippet editing for the current snippet | (`Alt+A`) |
-|----------------------------------------------------------------------------------|
+------------------------------------------------------------------------------
+ Command       | Description of function                              |  Key
+------------------------------------------------------------------------------
+               | with an optional parameter to specify which snippet  |
+ snippetinsert | should be inserted.                                  | Alt+S
+               | If the parameter is absent, the word right           |
+               | before the cursor will be used for this.
+------------------------------------------------------------------------------
+ snippetnext   | proceeds to the next placeholder                     | Alt+W 
+------------------------------------------------------------------------------
+ snippetcancel | removes all the current snippet                      | Alt+D 
+------------------------------------------------------------------------------
+ snippetaccept | finishes the snippet editing for the current snippet | Alt+A 
+------------------------------------------------------------------------------
 
 ## Snippet Files
 
