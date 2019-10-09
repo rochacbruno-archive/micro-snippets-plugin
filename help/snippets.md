@@ -56,9 +56,27 @@ Micro editor as a help file here https://github.com/zyedidia/micro/blob/master/r
 
 ```json
 {
-"Alt-w": "snippets.Next"),
+"Alt-w": "snippets.Next",
 "Alt-a": "snippets.Accept",
 "Alt-s": "snippets.Insert",
 "Alt-d": "snippets.Cancel"
 }
 ```
+
+## Raw key codes
+
+Micro has a command `raw`
+
+Micro will open a new tab and show the escape sequence for every event it receives from the terminal.
+
+This shows you what micro actually sees from the terminal and helps you see which bindings aren't possible and why.
+
+This is most useful for debugging keybindings.
+
+Example 
+
+\x1b turns into \u001 then the same as the raw output.
+
+`"\u001bctrlback": "DeleteWordLeft"`
+
+Micro editor help file https://github.com/zyedidia/micro/blob/master/runtime/help/keybindings.md
