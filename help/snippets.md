@@ -45,3 +45,20 @@ snippet fmtfunc
          fmt.Println("${0} prints:", ${1:value})
     }
 ```
+
+## Custom Key Bindings
+
+Add a file, if not already created in `~/.config/micro/bindings.json`
+
+Change the default keys you want to use.
+
+Micro editor as a help file here https://github.com/zyedidia/micro/blob/master/runtime/help/keybindings.md
+
+```json
+{
+"Alt-w": "snippets.Next"),
+"Alt-a": "snippets.Accept",
+"Alt-s": "snippets.Insert",
+"Alt-d": "snippets.Cancel"
+}
+```
