@@ -1,6 +1,6 @@
 # About the snippet plugin
 
-This plugin is designed to work with simple VIM snippets like the once from 
+This plugin is designed to work with simple VIM snippets like the once from
 [here](https://github.com/honza/vim-snippets/tree/master/snippets)
 The plugin itself doesn't provide any snippets. To add snippets for a language
 place a file containing the snippets at `~/.config/micro/plugins/snippets/[filetype].snippets`
@@ -9,15 +9,15 @@ place a file containing the snippets at `~/.config/micro/plugins/snippets/[filet
 
 The plugin provides the following commands:
 
- Command       | Description of function                              |  Key
----------------|:-----------------------------------------------------|:-----:
- snippetinsert | with an optional parameter to specify which snippet  | Alt+S
- '             | should be inserted.                                  | 
- '             | If the parameter is absent, the word right           |
- '             | before the cursor will be used for this.             | 
- snippetnext   | proceeds to the next placeholder                     | Alt+W
- snippetcancel | removes all the current snippet                      | Alt+D
- snippetaccept | finishes the snippet editing for the current snippet | Alt+A
+ | Command       | Description of function                              |  Key  |
+ | ------------- | :--------------------------------------------------- | :---: |
+ | snippetinsert | with an optional parameter to specify which snippet  | Alt+S |
+ | '             | should be inserted.                                  |
+ | '             | If the parameter is absent, the word right           |
+ | '             | before the cursor will be used for this.             |
+ | snippetnext   | proceeds to the next placeholder                     | Alt+W |
+ | snippetcancel | removes all the current snippet                      | Alt+D |
+ | snippetaccept | finishes the snippet editing for the current snippet | Alt+A |
 
 ## Snippet Files
 
