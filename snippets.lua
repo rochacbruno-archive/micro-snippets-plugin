@@ -1,14 +1,19 @@
 VERSION = "0.1.4"
 
+-- Plugin variables
 local curFileType = ""
 local snippets = {}
 local currentSnippet = nil
-
+-- LOcation
 local Location = {}
 Location.__index = Location
-
+-- Snippet
 local Snippet = {}
 Snippet.__index = Snippet
+
+-- ---------------------
+-- Location functions
+-- ---------------------
 
 function Location.new(idx, ph, snip)
 	local self = setmetatable({}, Location)
@@ -136,6 +141,70 @@ function Location.handleInput(self, ev)
 	return false
 end
 
+-- -----------------------------
+-- Snippet Functions
+-- -----------------------------
+
+-- -------------------------------
+-- ReadSnippet - Pass in filetype from micro editor and 
+-- --------------------------------
+local function ReadSnippets(filetype)
+	-- load all snippets file names
+	local snippets = {}
+	local allSnippetFiles = ListRuntimeFiles("snippets")
+	local exists = false
+	-- check filetype has a snippet file to load
+	for i = 1, #allSnippetFiles do
+		if allSnippetFiles[i] == filetype then
+			exists = true
+			break
+		end
+	end
+	-- check if snippet file exists for the current file type in micro editor
+	if not exists then
+		messenger:Error("No snippets file for \""..filetype.."\"")
+		return snippets
+	end
+
+	-- snippet file exists so load it
+	local snippetFile = ReadRuntimeFile("snippets", filetype)
+	-- local varibles declared
+	local curSnip = nil
+	local lineNo = 0
+
+	-- search for snippet in the snippet file
+	for line in string.gmatch(snippetFile, "(.-)\r?\n") do
+		lineNo = lineNo + 1
+		if string.match(line,"^#") then
+			-- comment
+		elseif line:match("^snippet") then
+			curSnip = Snippet.new()
+			for snipName in line:gmatch("%s(%a+)") do
+				snippets[snipName] = curSnip
+			end
+		else
+			local codeLine = line:match("^\t(.*)$")
+			if codeLine ~= nil then
+				curSnip:AddCodeLine(codeLine)
+			elseif line ~= "" then
+				messenger:Error("Invalid snippets file (Line #"..tostring(lineNo)..")")
+			end
+		end
+	end
+	return snippets
+end
+
+
+local function LoadSnippetsIfNeeded	()
+	local filetype = GetOption("filetype")
+	if curFileType ~= filetype then
+		snippets = ReadSnippets(filetype)
+		curFileType = filetype
+	end
+end
+
+
+
 function Snippet.new()
 	local self = setmetatable({}, Snippet)
 	self.code = ""
@@ -237,6 +306,8 @@ function Snippet.focusNext(self)
 	end
 end
 
+-- 
+
 local function CursorWord(v)
 	local c = v.Cursor
 	local x = c.X-1 -- start one rune before the cursor
@@ -254,55 +325,12 @@ local function CursorWord(v)
 	return result
 end
 
-local function ReadSnippets(filetype)
-	local snippets = {}
-	local allSnippetFiles = ListRuntimeFiles("snippets")
-	local exists = false
 
-	for i = 1, #allSnippetFiles do
-		if allSnippetFiles[i] == filetype then
-			exists = true
-			break
-		end
-	end
 
-	if not exists then
-		messenger:Error("No snippets file for \""..filetype.."\"")
-		return snippets
-	end
 
-	local snippetFile = ReadRuntimeFile("snippets", filetype)
-
-	local curSnip = nil
-	local lineNo = 0
-	for line in string.gmatch(snippetFile, "(.-)\r?\n") do
-		lineNo = lineNo + 1
-		if string.match(line,"^#") then
-			-- comment
-		elseif line:match("^snippet") then
-			curSnip = Snippet.new()
-			for snipName in line:gmatch("%s(%a+)") do
-				snippets[snipName] = curSnip
-			end
-		else
-			local codeLine = line:match("^\t(.*)$")
-			if codeLine ~= nil then
-				curSnip:AddCodeLine(codeLine)
-			elseif line ~= "" then
-				messenger:Error("Invalid snippets file (Line #"..tostring(lineNo)..")")
-			end
-		end
-	end
-	return snippets
-end
-
-local function EnsureSnippets()
-	local filetype = GetOption("filetype")
-	if curFileType ~= filetype then
-		snippets = ReadSnippets(filetype)
-		curFileType = filetype
-	end
-end
+-- ---------------------------------------
+-- Callback functions from micro editor --
+-- ---------------------------------------
 
 function onBeforeTextEvent(ev)
 	if currentSnippet ~= nil and currentSnippet.view == CurView() then
@@ -331,6 +359,13 @@ function onBeforeTextEvent(ev)
 
 end
 
+-- --------------------------------------------------------------------------
+-- functions called from micro editor by typing in commands or keybindings --
+-- --------------------------------------------------------------------------
+
+-- --------------------------------------------------------------------------
+-- Insert snippet - can have a name or not passed to it                    --
+-- --------------------------------------------------------------------------
 function Insert(name)
 	local v = CurView()
 	local c = v.Cursor
@@ -342,7 +377,7 @@ function Insert(name)
 		noArg = true
 	end
 
-	EnsureSnippets()
+	LoadSnippetsIfNeeded ()
 	local curSn = snippets[name]
 	if curSn then
 		currentSnippet = curSn:clone()
@@ -381,16 +416,18 @@ function Insert(name)
 	end
 end
 
+-- Current snippet goto the next place holder  
 function Next()
 	if currentSnippet then
 		currentSnippet:focusNext()
 	end
 end
-
+-- Accept changes to current snippet inserted and comes out of snippet editing
 function Accept()
 	currentSnippet = nil
 end
 
+-- Remove Current inserted snippetfrom micro editor
 function Cancel()
 	if currentSnippet then
 		currentSnippet:remove()
@@ -398,6 +435,9 @@ function Cancel()
 	end
 end
 
+-- ------------------------------------------
+-- 
+-- -------------------------------------------
 
 local function StartsWith(String,Start)
   String = String:upper()
@@ -405,9 +445,13 @@ local function StartsWith(String,Start)
   return string.sub(String,1,string.len(Start))==Start
 end
 
+-- ------------------------------------------------------
+-- Used with snippetinsert command in the micro editor --
+-- to find the snippets for autocompletion             --
+-- ------------------------------------------------------
 function findSnippet(input)
 	local result = {}
-	EnsureSnippets()
+	LoadSnippetsIfNeeded ()
 
 	for name,v in pairs(snippets) do
 		if StartsWith(name, input) then
@@ -417,18 +461,22 @@ function findSnippet(input)
 	return result
 end
 
--- Insert a snippet
+-- --------------------------------------------
+-- Micro Editor Commands to plugin functions --
+- ---------------------------------------------
+-- Insert a snippet command with autocomplete for snippets
 MakeCommand("snippetinsert", "snippets.Insert", MakeCompletion("snippets.findSnippet"), 0)
--- Mark next placeholder
+-- Goto next placeholder
 MakeCommand("snippetnext", "snippets.Next", 0)
 -- Cancel current snippet (removes the text)
 MakeCommand("snippetcancel", "snippets.Cancel", 0)
 -- Acceptes snipped editing
 MakeCommand("snippetaccept", "snippets.Accept", 0)
-
+-- Add help files to micro editor
 AddRuntimeFile("snippets", "help", "help/snippets.md")
+-- Add snippet files
 AddRuntimeFilesFromDirectory("snippets", "snippets", "snippets", "*.snippets")
-
+-- Key Bindings
 BindKey("Alt-w", "snippets.Next")
 BindKey("Alt-a", "snippets.Accept")
 BindKey("Alt-s", "snippets.Insert")
