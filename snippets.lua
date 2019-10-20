@@ -248,6 +248,7 @@ function Snippet.findLocation(self, loc)
     return nil
 end
 
+-- remove snippet from the micro editor
 function Snippet.remove(self)
     local endPos = self.startPos:Move(self:str():len(), self.view.Buf)
     self.modText = true
@@ -301,8 +302,8 @@ end
 -- -------------------------------------------------------------------------------------------------
 -- Get the word if there is one from where the cursor is in the currrent view in the micro editor --
 -- -------------------------------------------------------------------------------------------------
-local function TryGetCursorWordFromCurrentView(v)
-    local c = v.Cursor
+local function TryGetCursorWordFromCurrentView(view)
+    local c = view.Cursor
     local x = c.X - 1 -- start one rune before the cursor
     local result = ""
     while x >= 0 do
@@ -361,14 +362,14 @@ end
 -- --------------------------------------------------------------------------
 function Insert(name)
     -- setup variables
-    local v = CurView()
-    local c = v.Cursor
-    local buf = v.Buf
+    local view = CurView()
+    local c = view.Cursor
+    local buf = view.Buf
     local xy = Loc(c.X, c.Y)
     local noArg = false
     -- if no name passed in try and get the name from cursor position in micro editor
     if not name then
-        name = TryGetCursorWordFromCurrentView()
+        name = TryGetCursorWordFromCurrentView(view)
         noArg = true
     end
     if name "" then
@@ -379,7 +380,7 @@ function Insert(name)
     local curSn = snippets[name]
     if curSn then
         currentSnippet = curSn:clone()
-        currentSnippet.view = v
+        currentSnippet.view = view
 
         if noArg then
             currentSnippet.startPos = xy:Move(-name:len(), buf)
@@ -400,9 +401,9 @@ function Insert(name)
 
         if #currentSnippet.placeholders == 0 then
             local pos = currentSnippet.startPos:Move(currentSnippet:str():len(),
-                                                     v.Buf)
-            while v.Cursor:LessThan(pos) do v.Cursor:Right() end
-            while v.Cursor:GreaterThan(pos) do v.Cursor:Left() end
+                                                     view.Buf)
+            while view.Cursor:LessThan(pos) do view.Cursor:Right() end
+            while view.Cursor:GreaterThan(pos) do view.Cursor:Left() end
         else
             currentSnippet:focusNext()
         end
