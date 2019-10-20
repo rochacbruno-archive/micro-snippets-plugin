@@ -126,13 +126,9 @@ function Location.handleInput(self, ev)
     return false
 end
 
--- -----------------------------
--- Snippet Functions
--- -----------------------------
-
--- -------------------------------
--- ReadSnippet - Pass in filetype from micro editor and 
--- --------------------------------
+-- -------------------------------------------------------
+-- ReadSnippet - Pass in filetype from the micro editor --
+-- -------------------------------------------------------
 local function ReadSnippets(filetype)
     -- load all snippets file names
     local snippets = {}
@@ -187,6 +183,10 @@ local function LoadSnippetsIfNeeded()
         curFileType = filetype
     end
 end
+
+-- --------------------
+-- Snippet Functions --
+-- --------------------
 
 function Snippet.new()
     local self = setmetatable({}, Snippet)
@@ -284,7 +284,7 @@ end
 
 -- ------------------------------------------------------
 -- Used with snippetinsert command in the micro editor --
--- to find the snippets for autocompletion             --
+-- to find the snippets names for autocompletion       --
 -- ------------------------------------------------------
 function findSnippet(input)
     local result = {}
@@ -296,12 +296,17 @@ function findSnippet(input)
     return result
 end
 
+local function StartsWith(String, Start)
+    String = String:upper()
+    Start = Start:upper()
+    return string.sub(String, 1, string.len(Start)) == Start
+end
+
 -- --------------------------------
 -- Micro editor helper functions --
 -- --------------------------------
--- -------------------------------------------------------------------------------------------------
--- Get the word if there is one from where the cursor is in the currrent view in the micro editor --
--- -------------------------------------------------------------------------------------------------
+
+-- Get the word if there is one from where the cursor is in the currrent view in the micro editor
 local function TryGetCursorWordFromCurrentView(view)
     local c = view.Cursor
     local x = c.X - 1 -- start one rune before the cursor
@@ -357,9 +362,7 @@ end
 -- functions called from micro editor by typing in commands or keybindings --
 -- --------------------------------------------------------------------------
 
--- --------------------------------------------------------------------------
--- Insert snippet - can have a name or not passed to it                    --
--- --------------------------------------------------------------------------
+-- Insert snippet - can have a name or not passed to it
 function Insert(name)
     -- setup variables
     local view = CurView()
@@ -372,8 +375,8 @@ function Insert(name)
         name = TryGetCursorWordFromCurrentView(view)
         noArg = true
     end
-    if name "" then
-        messenger:Message("Unknown snippet \"" .. name .. "\"")
+    if name == "" then
+        messenger:Error("No snippet keyword sent \"" .. name .. "\"")
         return
     end
     LoadSnippetsIfNeeded()
@@ -399,6 +402,8 @@ function Insert(name)
 
         currentSnippet:insert()
 
+        messenger:Message("Inserted snippet \"" .. name .. "\"")
+
         if #currentSnippet.placeholders == 0 then
             local pos = currentSnippet.startPos:Move(currentSnippet:str():len(),
                                                      view.Buf)
@@ -422,17 +427,8 @@ function Cancel()
     if currentSnippet then
         currentSnippet:remove()
         Accept()
+        messenger:Message("Snippet Removed")
     end
-end
-
--- ------------------------------------------
--- 
--- -------------------------------------------
-
-local function StartsWith(String, Start)
-    String = String:upper()
-    Start = Start:upper()
-    return string.sub(String, 1, string.len(Start)) == Start
 end
 
 -- --------------------------------------------
