@@ -1,10 +1,12 @@
 VERSION = "0.1.4"
 
--- Plugin variables
+-- -------------------
+-- Plugin variables --
+-- -------------------
 local curFileType = ""
 local snippets = {}
 local currentSnippet = nil
--- LOcation
+-- Location
 local Location = {}
 Location.__index = Location
 -- Snippet
@@ -306,9 +308,13 @@ function Snippet.focusNext(self)
 	end
 end
 
--- 
-
-local function CursorWord(v)
+-- --------------------------------
+-- Micro editor helper functions --
+-- --------------------------------
+-- -------------------------------------------------------------------------------------------------
+-- Get the word if there is one from where the cursor is in the currrent view in the micro editor --
+-- -------------------------------------------------------------------------------------------------
+local function TryGetCursorWordFromCurrentView(v)
 	local c = v.Cursor
 	local x = c.X-1 -- start one rune before the cursor
 	local result = ""
@@ -367,13 +373,15 @@ end
 -- Insert snippet - can have a name or not passed to it                    --
 -- --------------------------------------------------------------------------
 function Insert(name)
+	-- setup variables
 	local v = CurView()
 	local c = v.Cursor
 	local buf = v.Buf
 	local xy = Loc(c.X, c.Y)
 	local noArg = false
+	-- if no name passed in try and get the name from cursor position in micro editor
 	if not name then
-		name = CursorWord(v)
+		name = TryGetCursorWordFromCurrentView()
 		noArg = true
 	end
 
@@ -463,7 +471,7 @@ end
 
 -- --------------------------------------------
 -- Micro Editor Commands to plugin functions --
-- ---------------------------------------------
+-- ---------------------------------------------
 -- Insert a snippet command with autocomplete for snippets
 MakeCommand("snippetinsert", "snippets.Insert", MakeCompletion("snippets.findSnippet"), 0)
 -- Goto next placeholder
