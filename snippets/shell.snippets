@@ -97,3 +97,21 @@ snippet fun
 	function ${1:function_name}() {
 		${0:#function_body}
 	}
+
+snippet animation
+        # var="/_\|"
+        frame="/_\|"
+        # let count=9
+        let count=9
+        # for x in $(seq 1 ${count}); do
+        for x in $(seq 1 ${count}); do
+            # for ((i = 0; i < ${#frame}; i++)); do
+            for ((i = 0; i < ${#frame}; i++)); do
+                # sleep 0.1s
+                sleep 0.1s
+                # printf "\rhalo world ${frame:i:1}"
+                printf "\rhalo world ${frame:i:1}"
+            # done
+           done
+       # done
+       done
